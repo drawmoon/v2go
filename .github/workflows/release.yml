@@ -1,0 +1,132 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.21.0
+          cache: true
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Release for Windows
+        run: go build -ldflags "-s -w" -o wetogo-windows-amd64.exe
+        env:
+          GOOS: windows
+          GOARCH: amd64
+      - uses: actions/upload-artifact@v3
+        with:
+          name: 'wetogo-windows-amd64.exe'
+          path: 'wetogo-windows-amd64.exe'
+
+      - name: Release for Darwin
+        run: go build -ldflags "-s -w" -o wetogo-darwin-amd64
+        env:
+          GOOS: darwin
+          GOARCH: amd64
+      - uses: actions/upload-artifact@v3
+        with:
+          name: 'wetogo-darwin-amd64'
+          path: 'wetogo-darwin-amd64'
+
+      - name: Release for Linux
+        run: go build -ldflags "-s -w" -o wetogo-linux-amd64
+        env:
+          GOOS: linux
+          GOARCH: amd64
+      - uses: actions/upload-artifact@v3
+        with:
+          name: 'wetogo-linux-amd64'
+          path: 'wetogo-linux-amd64'
+
+  release_windows:
+    name: Release for Windows
+    runs-on: ubuntu-latest
+
+    needs: [build]
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [amd64]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: wetogo-windows-${{ matrix.arch }}.exe
+          path: wetogo-windows
+      - run: |
+          cp README.md LICENSE v2go.json wetogo-windows/.
+          tar -czvf wetogo-windows-${{ matrix.arch }}.tar.gz wetogo-windows
+      - run: sha256sum wetogo-windows-${{ matrix.arch }}.tar.gz > wetogo-windows-${{ matrix.arch }}.tar.gz.sha256sum
+      - uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: wetogo-windows-${{ matrix.arch }}.*
+          tag: ${{ github.ref }}
+          overwrite: false
+          file_glob: true
+
+  release_darwin:
+    name: Release for Darwin
+    runs-on: ubuntu-latest
+
+    needs: [build]
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [amd64]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: wetogo-darwin-${{ matrix.arch }}
+          path: wetogo-darwin
+      - run: |
+          cp README.md LICENSE v2go.json wetogo-darwin/.
+          tar -czvf wetogo-darwin-${{ matrix.arch }}.tar.gz wetogo-darwin
+      - run: sha256sum wetogo-darwin-${{ matrix.arch }}.tar.gz > wetogo-darwin-${{ matrix.arch }}.tar.gz.sha256sum
+      - uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: wetogo-darwin-${{ matrix.arch }}.*
+          tag: ${{ github.ref }}
+          overwrite: false
+          file_glob: true
+
+  release_linux:
+    name: Release for Linux
+    runs-on: ubuntu-latest
+
+    needs: [build]
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [amd64]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: wetogo-linux-${{ matrix.arch }}
+          path: wetogo-linux
+      - run: |
+          cp README.md LICENSE v2go.json wetogo-linux/.
+          tar -czvf wetogo-linux-${{ matrix.arch }}.tar.gz wetogo-linux
+      - run: sha256sum wetogo-linux-${{ matrix.arch }}.tar.gz > wetogo-linux-${{ matrix.arch }}.tar.gz.sha256sum
+      - uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: wetogo-linux-${{ matrix.arch }}.*
+          tag: ${{ github.ref }}
+          overwrite: false
+          file_glob: true

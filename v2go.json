@@ -1,0 +1,33 @@
+{
+    "logLevel": "info",
+    "urls": [
+        "https://bulinkbulink.com/freefq/free/master/v2"
+    ],
+    "core": "xray",
+    "config": "config.json",
+    "concurrency": 12,
+    "times": 10,
+    "timeout": 5,
+    "proxies": [
+        {
+            "selector": "美国CloudFlare",
+            "tag": "cf"
+        },
+        {
+            "selector": "香港",
+            "tag": "hk"
+        }
+    ],
+    "listeners": [
+        {
+            "protocol": "http",
+            "address": "127.0.0.1",
+            "port": 10809
+        },
+        {
+            "protocol": "socks",
+            "address": "127.0.0.1",
+            "port": 10808
+        }
+    ]
+}
