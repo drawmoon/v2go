@@ -9,8 +9,9 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	log "github.com/sirupsen/logrus"
 	"github.com/sourcegraph/conc/pool"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type ProxyCtl struct {

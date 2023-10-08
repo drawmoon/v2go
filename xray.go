@@ -8,7 +8,6 @@ import (
 	"io"
 	"os/exec"
 	"regexp"
-	"strings"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -27,18 +26,20 @@ func (x *Xray) Start(file string) (*exec.Cmd, error) {
 	if err := cmd.Start(); err != nil {
 		return nil, err
 	}
-	re := regexp.MustCompile(`(?i)(?:x|v2)ray \d+\.\d+\.\d+ started`)
+	sre := regexp.MustCompile(`(?i)(?:x|v2)ray \d+\.\d+\.\d+ started`) // match startup successful
+	fre := regexp.MustCompile(`(?i)failed to start: (.+)`)             // match startup failure
 	reader := bufio.NewReader(stdout)
 	for {
 		str, err := reader.ReadString('\n')
 		if err != nil && err != io.EOF {
 			return nil, fmt.Errorf("unable to get service status: %s", x.Home)
 		}
-		if strings.HasPrefix(str, "Failed to start:") {
-			return nil, errors.New("failed to start")
-		}
-		if re.MatchString(str) {
+		if sre.MatchString(str) {
 			break
+		}
+		if fre.MatchString(str) {
+			msg := fre.FindStringSubmatch(str)[1]
+			return nil, errors.New("failed to start xray: " + msg)
 		}
 	}
 	return cmd, nil
