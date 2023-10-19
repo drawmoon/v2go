@@ -67,7 +67,7 @@ func test(servers []*Server) []*Server {
 		return arr[i].Latency < arr[j].Latency
 	})
 
-	var fastest []*Server
+	var finals []*Server
 	if len(settings.Proxies) > 0 {
 		for _, p := range settings.Proxies {
 			re := regexp.MustCompile(p.Selector)
@@ -79,23 +79,34 @@ func test(servers []*Server) []*Server {
 					break
 				}
 			}
-			if final != nil {
-				fastest = append(fastest, final)
-				log.Printf("selected proxy: '%s', the fastest server is '%s', latency: %dms", p.Tag, final.Remarks, final.Latency)
-			} else {
+			if final == nil {
 				log.Printf("selected proxy no server available: '%s'", p.Tag)
+				continue
 			}
+			found := false
+			for _, s := range finals {
+				if s.Remarks == final.Remarks {
+					found = true
+					break
+				}
+			}
+			if found {
+				log.Printf("selected proxy already exists: '%s'", p.Tag)
+				continue
+			}
+			finals = append(finals, final)
+			log.Printf("selected proxy: '%s', the fastest server is '%s', latency: %dms", p.Tag, final.Remarks, final.Latency)
 		}
 	} else {
 		final := arr[0]
-		fastest = append(fastest, final)
+		finals = append(finals, final)
 		log.Printf("the fastest server is '%s', latency: %dms", final.Remarks, final.Latency)
 	}
-	if len(fastest) == 0 {
+	if len(finals) == 0 {
 		log.Fatal("no server available")
 	}
 
-	return fastest
+	return finals
 }
 
 func startFromFastestServer(servers []*Server) {
