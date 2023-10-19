@@ -91,6 +91,9 @@ func test(servers []*Server) []*Server {
 		fastest = append(fastest, final)
 		log.Printf("the fastest server is '%s', latency: %dms", final.Remarks, final.Latency)
 	}
+	if len(fastest) == 0 {
+		log.Fatal("no server available")
+	}
 
 	return fastest
 }
