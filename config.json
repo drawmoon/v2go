@@ -1,11 +1,10 @@
 {
-    "logLevel": "info",
+    "verbose": true,
     "urls": [
         "https://bulinkbulink.com/freefq/free/master/v2"
     ],
     "core": "xray",
-    "config": "config.json",
-    "concurrency": 12,
+    "concurrency": 6,
     "times": 10,
     "timeout": 5,
     "proxies": [
@@ -18,7 +17,7 @@
             "tag": "hk"
         }
     ],
-    "listeners": [
+    "listens": [
         {
             "protocol": "http",
             "address": "127.0.0.1",

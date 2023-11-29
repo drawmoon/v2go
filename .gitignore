@@ -22,3 +22,6 @@ go.work
 
 # App executable file
 bin
+
+# Macos file
+.DS_Store

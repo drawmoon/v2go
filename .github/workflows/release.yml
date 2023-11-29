@@ -21,34 +21,34 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Release for Windows
-        run: go build -ldflags "-s -w" -o wetogo-windows-amd64.exe
+        run: go build -ldflags "-s -w" -o xrc-windows-amd64.exe
         env:
           GOOS: windows
           GOARCH: amd64
       - uses: actions/upload-artifact@v3
         with:
-          name: 'wetogo-windows-amd64.exe'
-          path: 'wetogo-windows-amd64.exe'
+          name: 'xrc-windows-amd64.exe'
+          path: 'xrc-windows-amd64.exe'
 
       - name: Release for Darwin
-        run: go build -ldflags "-s -w" -o wetogo-darwin-amd64
+        run: go build -ldflags "-s -w" -o xrc-darwin-amd64
         env:
           GOOS: darwin
           GOARCH: amd64
       - uses: actions/upload-artifact@v3
         with:
-          name: 'wetogo-darwin-amd64'
-          path: 'wetogo-darwin-amd64'
+          name: 'xrc-darwin-amd64'
+          path: 'xrc-darwin-amd64'
 
       - name: Release for Linux
-        run: go build -ldflags "-s -w" -o wetogo-linux-amd64
+        run: go build -ldflags "-s -w" -o xrc-linux-amd64
         env:
           GOOS: linux
           GOARCH: amd64
       - uses: actions/upload-artifact@v3
         with:
-          name: 'wetogo-linux-amd64'
-          path: 'wetogo-linux-amd64'
+          name: 'xrc-linux-amd64'
+          path: 'xrc-linux-amd64'
 
   release_windows:
     name: Release for Windows
@@ -63,16 +63,16 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
         with:
-          name: wetogo-windows-${{ matrix.arch }}.exe
-          path: wetogo-windows
+          name: xrc-windows-${{ matrix.arch }}.exe
+          path: xrc-windows
       - run: |
-          cp README.md LICENSE v2go.json wetogo-windows/.
-          tar -czvf wetogo-windows-${{ matrix.arch }}.tar.gz wetogo-windows
-      - run: sha256sum wetogo-windows-${{ matrix.arch }}.tar.gz > wetogo-windows-${{ matrix.arch }}.tar.gz.sha256sum
+          cp README.md LICENSE v2go.json xrc-windows/.
+          tar -czvf xrc-windows-${{ matrix.arch }}.tar.gz xrc-windows
+      - run: sha256sum xrc-windows-${{ matrix.arch }}.tar.gz > xrc-windows-${{ matrix.arch }}.tar.gz.sha256sum
       - uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: wetogo-windows-${{ matrix.arch }}.*
+          file: xrc-windows-${{ matrix.arch }}.*
           tag: ${{ github.ref }}
           overwrite: false
           file_glob: true
@@ -90,16 +90,16 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
         with:
-          name: wetogo-darwin-${{ matrix.arch }}
-          path: wetogo-darwin
+          name: xrc-darwin-${{ matrix.arch }}
+          path: xrc-darwin
       - run: |
-          cp README.md LICENSE v2go.json wetogo-darwin/.
-          tar -czvf wetogo-darwin-${{ matrix.arch }}.tar.gz wetogo-darwin
-      - run: sha256sum wetogo-darwin-${{ matrix.arch }}.tar.gz > wetogo-darwin-${{ matrix.arch }}.tar.gz.sha256sum
+          cp README.md LICENSE v2go.json xrc-darwin/.
+          tar -czvf xrc-darwin-${{ matrix.arch }}.tar.gz xrc-darwin
+      - run: sha256sum xrc-darwin-${{ matrix.arch }}.tar.gz > xrc-darwin-${{ matrix.arch }}.tar.gz.sha256sum
       - uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: wetogo-darwin-${{ matrix.arch }}.*
+          file: xrc-darwin-${{ matrix.arch }}.*
           tag: ${{ github.ref }}
           overwrite: false
           file_glob: true
@@ -117,16 +117,16 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
         with:
-          name: wetogo-linux-${{ matrix.arch }}
-          path: wetogo-linux
+          name: xrc-linux-${{ matrix.arch }}
+          path: xrc-linux
       - run: |
-          cp README.md LICENSE v2go.json wetogo-linux/.
-          tar -czvf wetogo-linux-${{ matrix.arch }}.tar.gz wetogo-linux
-      - run: sha256sum wetogo-linux-${{ matrix.arch }}.tar.gz > wetogo-linux-${{ matrix.arch }}.tar.gz.sha256sum
+          cp README.md LICENSE v2go.json xrc-linux/.
+          tar -czvf xrc-linux-${{ matrix.arch }}.tar.gz xrc-linux
+      - run: sha256sum xrc-linux-${{ matrix.arch }}.tar.gz > xrc-linux-${{ matrix.arch }}.tar.gz.sha256sum
       - uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: wetogo-linux-${{ matrix.arch }}.*
+          file: xrc-linux-${{ matrix.arch }}.*
           tag: ${{ github.ref }}
           overwrite: false
           file_glob: true
