@@ -66,7 +66,7 @@ jobs:
           name: xrc-windows-${{ matrix.arch }}.exe
           path: xrc-windows
       - run: |
-          cp README.md LICENSE v2go.json xrc-windows/.
+          cp README.md LICENSE config.json xrc-windows/.
           tar -czvf xrc-windows-${{ matrix.arch }}.tar.gz xrc-windows
       - run: sha256sum xrc-windows-${{ matrix.arch }}.tar.gz > xrc-windows-${{ matrix.arch }}.tar.gz.sha256sum
       - uses: svenstaro/upload-release-action@v2
@@ -93,7 +93,7 @@ jobs:
           name: xrc-darwin-${{ matrix.arch }}
           path: xrc-darwin
       - run: |
-          cp README.md LICENSE v2go.json xrc-darwin/.
+          cp README.md LICENSE config.json xrc-darwin/.
           tar -czvf xrc-darwin-${{ matrix.arch }}.tar.gz xrc-darwin
       - run: sha256sum xrc-darwin-${{ matrix.arch }}.tar.gz > xrc-darwin-${{ matrix.arch }}.tar.gz.sha256sum
       - uses: svenstaro/upload-release-action@v2
@@ -120,7 +120,7 @@ jobs:
           name: xrc-linux-${{ matrix.arch }}
           path: xrc-linux
       - run: |
-          cp README.md LICENSE v2go.json xrc-linux/.
+          cp README.md LICENSE config.json xrc-linux/.
           tar -czvf xrc-linux-${{ matrix.arch }}.tar.gz xrc-linux
       - run: sha256sum xrc-linux-${{ matrix.arch }}.tar.gz > xrc-linux-${{ matrix.arch }}.tar.gz.sha256sum
       - uses: svenstaro/upload-release-action@v2
