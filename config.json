@@ -20,12 +20,10 @@
     "listens": [
         {
             "protocol": "http",
-            "address": "127.0.0.1",
             "port": 10809
         },
         {
             "protocol": "socks",
-            "address": "127.0.0.1",
             "port": 10808
         }
     ]
