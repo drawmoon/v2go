@@ -24,10 +24,6 @@ var (
 	localDnsAddr   = "127.0.0.1"
 )
 
-type Xray struct {
-	inst *core.Instance
-}
-
 type XrayLogger struct {
 	verbose bool
 }
@@ -41,6 +37,10 @@ func (x *XrayLogger) Write(s string) error {
 
 func (x *XrayLogger) Close() error {
 	return nil
+}
+
+type Xray struct {
+	inst *core.Instance
 }
 
 func NewXray(lks []*subscription.Link, listens []*settings.Listen, verbose, localDns bool, mux int16) (*Xray, error) {
