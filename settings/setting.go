@@ -36,13 +36,13 @@ func LoadSettings(f string) (*Setting, error) {
 	}
 	defer file.Close()
 
-	bytes, err := io.ReadAll(file)
+	b, err := io.ReadAll(file)
 	if err != nil {
 		return nil, errors.New("error reading app settings file")
 	}
 
 	var s *Setting
-	err = json.Unmarshal(bytes, &s)
+	err = json.Unmarshal(b, &s)
 	if err != nil {
 		return nil, errors.New("error parsing app settings file")
 	}

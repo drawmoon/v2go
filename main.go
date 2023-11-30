@@ -121,7 +121,7 @@ func printFastestLink(lks []*subscription.Link) {
 }
 
 func startProxy(lks []*subscription.Link) {
-	x, err := proxyctl.Start(lks, setting.Listens, setting.Verbose, setting.UseLocalDns, -1)
+	x, err := proxyctl.Start(lks, setting)
 	if err != nil {
 		log.Fatal(err)
 	}
