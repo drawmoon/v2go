@@ -23,6 +23,7 @@ func Fetch(urls []string) ([]*Link, error) {
 	// 尝试从缓存文件中读取订阅内容
 	cacheFile, err := os.Open(tmpFile)
 	if err == nil {
+		defer cacheFile.Close()
 		b, err := io.ReadAll(cacheFile)
 		if err == nil {
 			lines := strings.Split(string(b), "\n")
@@ -83,10 +84,7 @@ func Resubscribe(urls []string) ([]*Link, error) {
 
 	// 尝试将订阅内容写入缓存文件
 	if len > 0 {
-		err := os.WriteFile(tmpFile, []byte(strings.Join(b64StrArr, "\n")), 0644)
-		if err != nil {
-			return nil, err
-		}
+		os.WriteFile(tmpFile, []byte(strings.Join(b64StrArr, "\n")), 0644)
 	}
 
 	return lks, nil

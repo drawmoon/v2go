@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"io"
 	"main/proxyctl"
 	"main/settings"
 	"main/subscription"
@@ -46,29 +48,52 @@ func init() {
 func main() {
 	log.Debugf("core version: %s", proxyctl.CoreVersion())
 
-	lks, err := subscription.Fetch(setting.Urls)
-	if err != nil {
-		log.Fatal(err)
-	}
+	userProfile := filepath.Join(workDir, "user_profile.json")
+	var final []*subscription.Link
 
-	conc := func() int {
-		if setting.Concurrency <= 0 {
-			return 1
+	// 标记本地存储的节点测试状态，如果是 true 则需要重新测试所有节点
+	dirty := false
+
+	// 尝试读取本地存储的节点
+	upf, err := os.Open(userProfile)
+	if err == nil {
+		defer upf.Close()
+		b, err := io.ReadAll(upf)
+		if err == nil {
+			err = json.Unmarshal(b, &final)
+
+			// 重新再测试一次延迟
+			if err == nil {
+				final = proxyctl.ParallelMeasureDelay(final, setting.Concurrency, setting.Times, setting.Timeout)
+				dirty = len(final) == 0
+			}
 		}
-		return setting.Concurrency
-	}()
-
-	outlks := proxyctl.ParallelMeasureDelay(lks, conc, setting.Times, setting.Timeout)
-	sellks := selectLink(outlks, setting.Proxies)
-	if len(sellks) == 0 {
-		log.Fatal("no server available")
 	}
 
-	printFastestLink(sellks)
-	startProxy(sellks)
+	if len(final) == 0 || dirty {
+		lks, err := subscription.Fetch(setting.Urls)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		outlks := proxyctl.ParallelMeasureDelay(lks, setting.Concurrency, setting.Times, setting.Timeout)
+		final = matchSelector(outlks, setting.Proxies)
+		if len(final) == 0 {
+			log.Fatal("no server available")
+		}
+
+		// 尝试将节点写到本地
+		b, err := json.Marshal(final)
+		if err == nil {
+			os.WriteFile(userProfile, b, 0644)
+		}
+	}
+
+	printFastestLink(final)
+	startProxy(final)
 }
 
-func selectLink(lks []*subscription.Link, proxies []*settings.Proxy) []*subscription.Link {
+func matchSelector(lks []*subscription.Link, proxies []*settings.Proxy) []*subscription.Link {
 	var sellks []*subscription.Link
 	if len(lks) == 0 {
 		return sellks

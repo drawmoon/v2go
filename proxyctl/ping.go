@@ -14,6 +14,14 @@ import (
 )
 
 func ParallelMeasureDelay(lks []*subscription.Link, conc int, times int, timeout uint64) []*subscription.Link {
+	conc = func() int {
+		if conc <= 0 {
+			conc = 1
+		} else if len(lks) < conc {
+			conc = len(lks)
+		}
+		return conc
+	}()
 	log.Debugf("ping with %d threads", conc)
 
 	p := pool.New().WithMaxGoroutines(conc)
@@ -44,6 +52,9 @@ func ParallelMeasureDelay(lks []*subscription.Link, conc int, times int, timeout
 		}
 	}
 
+	if len(r) == 0 {
+		return r
+	}
 	return sortByDelay(r)
 }
 
