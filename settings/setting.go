@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"os"
+	"path/filepath"
 )
 
 type Setting struct {
@@ -30,6 +31,11 @@ type Listen struct {
 }
 
 func LoadSettings(f string) (*Setting, error) {
+	if !filepath.IsAbs(f) {
+		workDir, _ := GetWorkDir()
+		f = filepath.Join(workDir, "config.json")
+	}
+
 	file, err := os.Open(f)
 	if err != nil {
 		return nil, errors.New("not found app settings file")
@@ -48,4 +54,21 @@ func LoadSettings(f string) (*Setting, error) {
 	}
 
 	return s, nil
+}
+
+func GetWorkDir() (string, error) {
+	h, _ := os.UserHomeDir()
+	workDir := filepath.Join(h, ".xrc")
+
+	err := os.MkdirAll(workDir, os.ModePerm)
+	if err != nil && !os.IsExist(err) {
+		return "", err
+	}
+
+	return workDir, nil
+}
+
+func GetUserProfilePath() string {
+	workDir, _ := GetWorkDir()
+	return filepath.Join(workDir, "user_profile.json")
 }
