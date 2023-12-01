@@ -13,23 +13,23 @@ import (
 )
 
 func Run(setting *settings.Setting) {
-	var final []*subscription.Link
+	var lks []*subscription.Link
 	var err error
 
 	dirty := false
 
 	// 尝试读取本地存储的节点
-	final, dirty = getLocalSelectedNodes(setting, true)
+	lks, dirty = getLocalSelectedNodes(setting, true)
 
-	if len(final) == 0 || dirty {
-		final, err = remeasureDelay(setting)
+	if len(lks) == 0 || dirty {
+		lks, err = remeasureDelay(setting)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	printFastestLink(final)
-	startProxy(final, setting)
+	printFastestLink(lks)
+	startProxy(lks, setting)
 }
 
 func matchSelector(lks []*subscription.Link, proxies []*settings.Proxy) []*subscription.Link {
@@ -75,8 +75,8 @@ func matchSelector(lks []*subscription.Link, proxies []*settings.Proxy) []*subsc
 
 func printFastestLink(lks []*subscription.Link) {
 	if len(lks) == 1 {
-		f := lks[0]
-		log.Printf("the fastest server is '%s', latency: %dms", f.Remarks, f.Delay)
+		lk := lks[0]
+		log.Printf("the fastest server is '%s', latency: %dms", lk.Remarks, lk.Delay)
 	} else {
 		for _, lk := range lks {
 			log.Printf("selected proxy: '%s', the fastest server is '%s', latency: %dms", lk.Tag, lk.Remarks, lk.Delay)
