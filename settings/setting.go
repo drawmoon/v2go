@@ -9,7 +9,6 @@ import (
 )
 
 type Setting struct {
-	Verbose     bool      `json:"verbose"`     // 输出详细日志
 	Urls        []string  `json:"urls"`        // 订阅地址
 	Core        string    `json:"core"`        // 核心，xray
 	Times       int       `json:"times"`       // 测试次数
@@ -72,7 +71,6 @@ func LoadSettings() (*Setting, error) {
 
 func LoadDefaultSettings() *Setting {
 	return &Setting{
-		Verbose:     false,
 		Times:       10,
 		Timeout:     5,
 		Concurrency: 12,

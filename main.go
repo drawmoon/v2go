@@ -23,6 +23,7 @@ import (
 )
 
 var setting *settings.Setting
+var verbose bool
 var err error
 
 var (
@@ -43,31 +44,6 @@ var (
 		{"rmf", "Remove filter"},             // 删除指定的过滤器
 	}
 )
-
-type TableRow struct {
-	Index int
-	Name  string
-	Addr  string
-	Ping  int32
-}
-
-func init() {
-	setting, err = settings.LoadSettings()
-	if err != nil {
-		panic(err)
-	}
-
-	log.SetOutput(os.Stdout)
-	log.SetFormatter(&log.TextFormatter{
-		ForceColors: true,
-	})
-	log.SetLevel(func() log.Level {
-		if setting.Verbose {
-			return log.DebugLevel
-		}
-		return log.WarnLevel
-	}())
-}
 
 func main() {
 	flag.Usage = func() {
@@ -110,6 +86,24 @@ func main() {
 
 	flag.Parse()
 
+	setting, err = settings.LoadSettings()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
+
+	verbose = flags.verbose
+	log.SetOutput(os.Stdout)
+	log.SetFormatter(&log.TextFormatter{
+		ForceColors: true,
+	})
+	log.SetLevel(func() log.Level {
+		if verbose {
+			return log.DebugLevel
+		}
+		return log.WarnLevel
+	}())
+
 	var firstArg string
 	args := flag.Args()
 	if len(args) > 0 {
@@ -134,10 +128,6 @@ func main() {
 			setting.Save()
 			return
 		}
-	}
-
-	if flags.verbose {
-		setting.Verbose = flags.verbose
 	}
 
 	if flags.url != "" {
@@ -202,28 +192,24 @@ func main() {
 	setting.Save()
 
 	if flags.sub {
-		_, err := subscription.Resubscribe(setting.Urls)
+		fmt.Println("fetching subscriptions")
+
+		lks, err := subscription.Resubscribe(setting.Urls)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(0)
 		}
 
-		// if len(lks) == 0 {
-		// 	fmt.Println("no subscription found")
-		// } else {
-		// 	var nodeData [][]string
-		// 	for i, l := range lks {
-		// 		nodeData = append(nodeData, []string{
-		// 			fmt.Sprintf("%d", i),
-		// 			l.Remarks,
-		// 			l.Address,
-		// 		})
-		// 	}
-		// 	printAsTable([]string{"tag", "name", "addr"}, nodeData)
-		// }
+		if len(lks) == 0 {
+			fmt.Println("no subscription found")
+		} else {
+			fmt.Println("fetch subscription success")
+		}
 	}
 
 	if flags.ping {
+		fmt.Println("measuring delay")
+
 		lks, err := remeasureDelay()
 		if err != nil {
 			fmt.Println(err)
@@ -372,12 +358,13 @@ func printFastestLink(lks []*subscription.Link) {
 }
 
 func startProxy(lks []*subscription.Link) {
-	x, err := proxyctl.Start(lks, setting)
+	x, err := proxyctl.Start(lks, setting, verbose)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(0)
 	}
 	defer x.Close()
+	fmt.Println("start service successfully")
 
 	// 监听程序关闭
 	ch := make(chan os.Signal, 1)
@@ -386,7 +373,7 @@ func startProxy(lks []*subscription.Link) {
 	// 等待程序关闭消息
 	<-ch
 
-	log.Info("stop service successfully")
+	fmt.Println("stop service successfully")
 }
 
 func remeasureDelay() ([]*subscription.Link, error) {

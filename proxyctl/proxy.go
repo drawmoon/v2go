@@ -7,8 +7,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func Start(lks []*subscription.Link, setting *settings.Setting) (*Xray, error) {
-	log.Infof("starting service, choose the %d fastest servers", len(lks))
+func Start(lks []*subscription.Link, setting *settings.Setting, verbose bool) (*Xray, error) {
+	log.Debugf("starting service, choose the %d fastest servers", len(lks))
 
 	listens := setting.Listens
 	if len(listens) == 0 {
@@ -18,10 +18,10 @@ func Start(lks []*subscription.Link, setting *settings.Setting) (*Xray, error) {
 		})
 	}
 	for _, l := range listens {
-		log.Infof("listening on %s %s:%d", l.Protocol, "127.0.0.1", l.Port)
+		log.Debugf("listening on %s %s:%d", l.Protocol, "127.0.0.1", l.Port)
 	}
 
-	x, err := NewXray(lks, listens, setting.Verbose, setting.UseLocalDns, -1)
+	x, err := NewXray(lks, listens, verbose, setting.UseLocalDns, -1)
 	if err != nil {
 		return nil, err
 	}
