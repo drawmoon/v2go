@@ -52,6 +52,10 @@ func Fetch(urls []string) ([]*Link, error) {
 }
 
 func Resubscribe(urls []string) ([]*Link, error) {
+	if len(urls) == 0 {
+		return nil, errors.New("no subscription urls")
+	}
+
 	log.Debugln("fetching subscriptions")
 	var lks []*Link
 	var b64StrArr []string

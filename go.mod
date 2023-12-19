@@ -3,9 +3,10 @@ module main
 go 1.21
 
 require (
+	github.com/google/uuid v1.5.0
+	github.com/olekukonko/tablewriter v0.0.5
 	github.com/sirupsen/logrus v1.9.3
 	github.com/sourcegraph/conc v0.3.0
-	github.com/spf13/cobra v1.8.0
 	github.com/xtls/xray-core v1.8.4
 )
 
@@ -20,9 +21,9 @@ require (
 	github.com/google/btree v1.1.2 // indirect
 	github.com/google/pprof v0.0.0-20230821062121-407c9e7a662f // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
-	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
+	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/onsi/ginkgo/v2 v2.12.0 // indirect
 	github.com/pires/go-proxyproto v0.7.0 // indirect
 	github.com/quic-go/qtls-go1-20 v0.3.3 // indirect
@@ -33,7 +34,6 @@ require (
 	github.com/sagernet/sing-shadowsocks v0.2.4 // indirect
 	github.com/sagernet/wireguard-go v0.0.0-20221116151939-c99467f53f2c // indirect
 	github.com/seiflotfy/cuckoofilter v0.0.0-20220411075957-e3b120b3f5fb // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/v2fly/ss-bloomring v0.0.0-20210312155135-28617310f63e // indirect
 	github.com/xtls/reality v0.0.0-20230828171259-e426190d57f6 // indirect
 	go.uber.org/atomic v1.11.0 // indirect

@@ -16,11 +16,11 @@ type Setting struct {
 	Timeout     uint64    `json:"timeout"`     // 测试超时等待时间
 	Concurrency int       `json:"concurrency"` // 测试使用的线程数
 	UseLocalDns bool      `json:"useLocalDns"` // 使用本地 DNS
-	Proxies     []*Proxy  `json:"proxies"`     // 代理配置
+	Filters     []*Filter `json:"filters"`     // 代理配置
 	Listens     []*Listen `json:"listens"`     // 监听配置
 }
 
-type Proxy struct {
+type Filter struct {
 	Selector string `json:"selector"` // 选择器，正则表达式
 	Tag      string `json:"tag"`      // 标签
 }
@@ -30,15 +30,29 @@ type Listen struct {
 	Port     uint32 `json:"port"`     // 监听端口
 }
 
-func LoadSettings(f string) (*Setting, error) {
-	if !filepath.IsAbs(f) {
-		workDir, _ := GetWorkDir()
-		f = filepath.Join(workDir, "config.json")
-	}
-
-	file, err := os.Open(f)
+func (s *Setting) Save() error {
+	cp := GetAppSettingPath()
+	b, err := json.Marshal(s)
 	if err != nil {
-		return nil, errors.New("not found app settings file")
+		return err
+	}
+	return os.WriteFile(cp, b, 0644)
+}
+
+func LoadSettings() (*Setting, error) {
+	cp := GetAppSettingPath()
+	file, err := os.Open(cp)
+	if err != nil {
+		if os.IsNotExist(err) {
+			s := LoadDefaultSettings()
+			err := s.Save()
+			if err != nil {
+				return nil, err
+			}
+			return s, nil
+		} else {
+			return nil, err
+		}
 	}
 	defer file.Close()
 
@@ -56,6 +70,16 @@ func LoadSettings(f string) (*Setting, error) {
 	return s, nil
 }
 
+func LoadDefaultSettings() *Setting {
+	return &Setting{
+		Verbose:     false,
+		Times:       10,
+		Timeout:     5,
+		Concurrency: 12,
+		Listens:     []*Listen{{Protocol: "socks", Port: 10888}},
+	}
+}
+
 func GetWorkDir() (string, error) {
 	h, _ := os.UserHomeDir()
 	workDir := filepath.Join(h, ".xrc")
@@ -66,6 +90,11 @@ func GetWorkDir() (string, error) {
 	}
 
 	return workDir, nil
+}
+
+func GetAppSettingPath() string {
+	workDir, _ := GetWorkDir()
+	return filepath.Join(workDir, "config.json")
 }
 
 func GetUserProfilePath() string {
